@@ -280,7 +280,7 @@ foreign export javascript "hs_start" main :: IO ()
 parentComponent
   :: Example
   -> Component parent () ParentModel ParentAction
-parentComponent ex = component emptyModel updateModel (viewModel () ex)
+parentComponent ex = component emptyModel updateModel (viewModel ex)
   where
     updateModel = \case
       ParentAdd ->
@@ -294,7 +294,7 @@ emptyModel = ParentModel 0 0
 ----------------------------------------------------------------------------
 -- | Constructs a virtual DOM from a model
 -- viewModel :: ParentModel -> View ParentModel ParentAction
-viewModel Example {..} m =
+viewModel Example {..} () m =
   H.div_
   [ P.className "counters-section"
   ]
@@ -372,8 +372,8 @@ updateChildModel = \case
 box
   :: Eq model
   => Example 
-  -> Component () props model action1
-  -> Component parent () props TopAction
+  -> Component parent props model action1
+  -> Component parent props () TopAction
 box Example {..} vcomp = component () update_ $ \() ->
   H.div_
     [ P.class_ "box"
