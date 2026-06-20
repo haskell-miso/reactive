@@ -10,22 +10,21 @@ This demonstrates [reactivity](https://en.wikipedia.org/wiki/Functional_reactive
 ## Example
 
 ```haskell
-childComponent :: MisoString -> Component ParentModel ChildModel ChildAction
+childComponent :: MisoString -> Component ParentModel props ChildModel ChildAction
 childComponent childComponentName = (component (ChildModel 0) noop view_)
   { bindings =
       [ parentField <---> childField
         -- ^ dmj: Bidirectional synch between parent and child `model`, using `Lens`
       ]
   } where
-      view_ :: ChildModel -> View ChildModel ChildAction
-      view_ (ChildModel x) =
-        div_
-        []
-        [ h3_ [] [ text ("Child Component " <> childComponentName) ]
-        , button_ [ onClick ChildAdd ] [ "+" ]
-        , text (ms x)
-        , button_ [ onClick ChildSubtract ] [ "-" ]
-        ]
+      view_ :: props -> ChildModel -> View ChildModel ChildAction
+      view_ _ (ChildModel x) =
+        vfrag
+          [ h3_ [] [ text ("Child Component " <> childComponentName) ]
+          , button_ [ onClick ChildAdd ] [ "+" ]
+          , text (ms x)
+          , button_ [ onClick ChildSubtract ] [ "-" ]
+          ]
 ```
 
 ## Introduction
