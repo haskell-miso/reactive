@@ -59,7 +59,7 @@ main = startApp defaultEvents Main.topLevel
 data TopAction = Highlight DOMRef
 ----------------------------------------------------------------------------
 topLevel = (component () noop viewTop)
-#ifndef WASM
+#ifdef INTERACTIVE
   { scripts =
       [ Src "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js" False
       , Src "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/haskell.min.js" False
@@ -72,7 +72,7 @@ topLevel = (component () noop viewTop)
   }
 #endif
   where
-    viewTop () = vfrag
+    viewTop _ () = vfrag
       [ githubStar
       , H.h1_
         [ CSS.style_ [ CSS.fontFamily "monospace" ] ]
@@ -95,8 +95,7 @@ githubStar = H.iframe_
     , P.width_ "170"
     , textProp "scrolling" "0"
     , textProp "frameborder" "0"
-    , P.src_
-      "https://ghbtns.com/github-btn.html?user=haskell-miso&repo=miso-reactive&type=star&count=true&size=large"
+    , P.src_ "https://ghbtns.com/github-btn.html?user=haskell-miso&repo=miso-reactive&type=star&count=true&size=large"
     ]
     []
 ----------------------------------------------------------------------------
@@ -138,7 +137,7 @@ bidiParentChild = Example
          $(makeLenses ''ChildModel)
 
          child
-           :: Component ParentModel ChildModel ChildAction
+           :: Component ParentModel props ChildModel ChildAction
          child = childComponent
            { bindings =
              [ parentCounter <--> childCounter
@@ -179,7 +178,7 @@ uniParent = Example
          $(makeLenses ''ChildModel)
 
          child
-           :: Component ParentModel ChildModel ChildAction
+           :: Component ParentModel props ChildModel ChildAction
          child = childComponent
            { bindings =
                [ parentCounter --> childCounter
@@ -221,7 +220,7 @@ uniChild = Example
          $(makeLenses ''ChildModel)
 
          child
-           :: Component ParentModel ChildModel ChildAction
+           :: Component ParentModel props ChildModel ChildAction
          child = childComponent
            { bindings =
              [ parentCounter <-- childCounter
@@ -263,7 +262,7 @@ bidiSibling = Example
          $(makeLenses ''ChildModel)
 
          child
-           :: Component ParentModel ChildModel ChildAction
+           :: Component ParentModel props ChildModel ChildAction
          child = childComponent
            { bindings =
                [ proxy <--> childCounter
@@ -280,7 +279,7 @@ foreign export javascript "hs_start" main :: IO ()
 -- | `Component` takes as arguments the initial model, update function, view function
 parentComponent
   :: Example
-  -> Component parent ParentModel ParentAction
+  -> Component parent props ParentModel ParentAction
 parentComponent = component emptyModel updateModel . viewModel
   where
     updateModel = \case
@@ -331,7 +330,7 @@ viewModel Example {..} m =
   ]
 ----------------------------------------------------------------------------
 -- | Component used for distribution
-childComponent :: MisoString -> Component ParentModel ChildModel ChildAction
+childComponent :: MisoString -> Component ParentModel props ChildModel ChildAction
 childComponent name = (component (ChildModel 0) updateChildModel childView_)
   where
       childView_ :: ChildModel -> View ChildModel ChildAction
@@ -363,7 +362,7 @@ childComponent name = (component (ChildModel 0) updateChildModel childView_)
         ]
 ----------------------------------------------------------------------------
 -- | Updates model, optionally introduces side effects
-updateChildModel :: ChildAction -> Effect ParentModel ChildModel ChildAction
+updateChildModel :: ChildAction -> Effect ParentModel props ChildModel ChildAction
 updateChildModel = \case
   ChildAdd ->
     childCounter += 1
@@ -373,8 +372,8 @@ updateChildModel = \case
 box
   :: Eq model
   => Example 
-  -> Component () model action1
-  -> Component parent () TopAction
+  -> Component () props model action1
+  -> Component parent () props TopAction
 box Example {..} vcomp = component () update_ $ \() ->
   H.div_
     [ P.class_ "box"
