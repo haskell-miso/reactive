@@ -374,7 +374,7 @@ box
   => Example 
   -> Component parent props model action1
   -> Component parent props () TopAction
-box Example {..} vcomp = component () update_ $ \() ->
+box Example {..} vcomp = component () update_ $ \_ () ->
   H.div_
     [ P.class_ "box"
     ]
