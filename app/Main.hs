@@ -279,8 +279,8 @@ foreign export javascript "hs_start" main :: IO ()
 -- | `Component` takes as arguments the initial model, update function, view function
 parentComponent
   :: Example
-  -> Component parent props ParentModel ParentAction
-parentComponent = component emptyModel updateModel . viewModel
+  -> Component parent () ParentModel ParentAction
+parentComponent ex = component emptyModel updateModel (viewModel () ex)
   where
     updateModel = \case
       ParentAdd ->
@@ -330,11 +330,11 @@ viewModel Example {..} m =
   ]
 ----------------------------------------------------------------------------
 -- | Component used for distribution
-childComponent :: MisoString -> Component ParentModel props ChildModel ChildAction
+childComponent :: MisoString -> Component ParentModel () ChildModel ChildAction
 childComponent name = (component (ChildModel 0) updateChildModel childView_)
   where
-      childView_ :: ChildModel -> View ChildModel ChildAction
-      childView_ m =
+      childView_ :: () -> ChildModel -> View ChildModel ChildAction
+      childView_ _ m =
         H.div_
         [ P.className "counter-example"
         ]
