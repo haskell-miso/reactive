@@ -372,7 +372,7 @@ updateChildModel = \case
 box
   :: Eq model
   => Example 
-  -> Component () props model action1
+  -> Component () () model action1
   -> Component parent props () TopAction
 box Example {..} vcomp = component () update_ $ \_ () ->
   H.div_
